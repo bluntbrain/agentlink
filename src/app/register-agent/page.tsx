@@ -81,46 +81,59 @@ export default function RegisterAgentPage() {
     const [parentKey, childKey] = name.split('.') as [keyof PartialAgentCard & string, string]
 
     if (parentKey === 'provider') {
-      setAgentCard((prev) => ({
-        ...prev,
-        provider: {
-          ...(prev.provider || {}),
-          [childKey]: value,
-        },
-      }))
+      // Use type assertion to help TypeScript understand the structure
+      setAgentCard((prev) => {
+        const providerObj = prev.provider || {}
+        return {
+          ...prev,
+          provider: {
+            ...providerObj,
+            [childKey]: value,
+          },
+        } as PartialAgentCard
+      })
     } else if (parentKey === 'capabilities') {
-      setAgentCard((prev) => ({
-        ...prev,
-        capabilities: {
-          ...(prev.capabilities || {}),
-          [childKey]: value === 'true',
-        },
-      }))
+      setAgentCard((prev) => {
+        const capabilitiesObj = prev.capabilities || {}
+        return {
+          ...prev,
+          capabilities: {
+            ...capabilitiesObj,
+            [childKey]: value === 'true',
+          },
+        } as PartialAgentCard
+      })
     } else if (parentKey === 'authentication') {
-      setAgentCard((prev) => ({
-        ...prev,
-        authentication: {
-          ...(prev.authentication || {}),
-          [childKey]:
-            childKey === 'schemes'
-              ? value
-                  .split(',')
-                  .map((s) => s.trim())
-                  .filter(Boolean)
-              : value,
-        },
-      }))
+      setAgentCard((prev) => {
+        const authObj = prev.authentication || {}
+        return {
+          ...prev,
+          authentication: {
+            ...authObj,
+            [childKey]:
+              childKey === 'schemes'
+                ? value
+                    .split(',')
+                    .map((s) => s.trim())
+                    .filter(Boolean)
+                : value,
+          },
+        } as PartialAgentCard
+      })
     }
   }
 
   const handleCapabilityChange = (capability: keyof AgentCardType['capabilities'], checked: boolean) => {
-    setAgentCard((prev) => ({
-      ...prev,
-      capabilities: {
-        ...prev.capabilities,
-        [capability]: checked,
-      },
-    }))
+    setAgentCard((prev) => {
+      const capabilitiesObj = prev.capabilities || {}
+      return {
+        ...prev,
+        capabilities: {
+          ...capabilitiesObj,
+          [capability]: checked,
+        },
+      } as PartialAgentCard
+    })
   }
 
   const handleSkillChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -169,10 +182,13 @@ export default function RegisterAgentPage() {
         id: currentSkill.id || `skill-${Date.now()}`, // Generate an ID if not provided
       } as AgentSkill
 
-      setAgentCard((prev) => ({
-        ...prev,
-        skills: [...(prev.skills || []), newSkill],
-      }))
+      setAgentCard((prev) => {
+        const skillsArray = prev.skills || []
+        return {
+          ...prev,
+          skills: [...skillsArray, newSkill],
+        } as PartialAgentCard
+      })
 
       // Reset current skill
       setCurrentSkill({
@@ -188,10 +204,13 @@ export default function RegisterAgentPage() {
   }
 
   const removeSkill = (index: number) => {
-    setAgentCard((prev) => ({
-      ...prev,
-      skills: prev.skills?.filter((_, i) => i !== index),
-    }))
+    setAgentCard((prev) => {
+      const skillsArray = prev.skills || []
+      return {
+        ...prev,
+        skills: skillsArray.filter((_, i) => i !== index),
+      } as PartialAgentCard
+    })
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -517,13 +536,16 @@ export default function RegisterAgentPage() {
                             placeholder="text/plain, application/json"
                             value={agentCard.defaultInputModes?.join(', ')}
                             onChange={(e) =>
-                              setAgentCard((prev) => ({
-                                ...prev,
-                                defaultInputModes: e.target.value
-                                  .split(',')
-                                  .map((s) => s.trim())
-                                  .filter(Boolean),
-                              }))
+                              setAgentCard(
+                                (prev) =>
+                                  ({
+                                    ...prev,
+                                    defaultInputModes: e.target.value
+                                      .split(',')
+                                      .map((s) => s.trim())
+                                      .filter(Boolean),
+                                  }) as PartialAgentCard,
+                              )
                             }
                             className="bg-[#0d1117] border-[#30363d] text-[#c9d1d9] placeholder:text-[#8b949e] focus-visible:ring-[#1f6feb]"
                           />
@@ -539,13 +561,16 @@ export default function RegisterAgentPage() {
                             placeholder="text/plain, application/json"
                             value={agentCard.defaultOutputModes?.join(', ')}
                             onChange={(e) =>
-                              setAgentCard((prev) => ({
-                                ...prev,
-                                defaultOutputModes: e.target.value
-                                  .split(',')
-                                  .map((s) => s.trim())
-                                  .filter(Boolean),
-                              }))
+                              setAgentCard(
+                                (prev) =>
+                                  ({
+                                    ...prev,
+                                    defaultOutputModes: e.target.value
+                                      .split(',')
+                                      .map((s) => s.trim())
+                                      .filter(Boolean),
+                                  }) as PartialAgentCard,
+                              )
                             }
                             className="bg-[#0d1117] border-[#30363d] text-[#c9d1d9] placeholder:text-[#8b949e] focus-visible:ring-[#1f6feb]"
                           />
@@ -562,16 +587,19 @@ export default function RegisterAgentPage() {
                           placeholder="api_key, oauth2"
                           value={agentCard.authentication?.schemes?.join(', ')}
                           onChange={(e) =>
-                            setAgentCard((prev) => ({
-                              ...prev,
-                              authentication: {
-                                ...prev.authentication,
-                                schemes: e.target.value
-                                  .split(',')
-                                  .map((s) => s.trim())
-                                  .filter(Boolean),
-                              },
-                            }))
+                            setAgentCard(
+                              (prev) =>
+                                ({
+                                  ...prev,
+                                  authentication: {
+                                    ...prev.authentication,
+                                    schemes: e.target.value
+                                      .split(',')
+                                      .map((s) => s.trim())
+                                      .filter(Boolean),
+                                  },
+                                }) as PartialAgentCard,
+                            )
                           }
                           className="bg-[#0d1117] border-[#30363d] text-[#c9d1d9] placeholder:text-[#8b949e] focus-visible:ring-[#1f6feb]"
                         />
